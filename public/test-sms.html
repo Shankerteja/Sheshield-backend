@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test SMS Sending</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #4a5568;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4c51bf;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #434190;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 4px;
+    }
+    .success {
+      background-color: #c6f6d5;
+      color: #2f855a;
+    }
+    .error {
+      background-color: #fed7d7;
+      color: #c53030;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test SMS Sending</h1>
+  
+  <div class="form-group">
+    <label for="phoneNumber">Phone Number (with country code):</label>
+    <input type="text" id="phoneNumber" placeholder="+919392792013" value="+919392792013">
+  </div>
+  
+  <button id="sendButton">Send Test SMS</button>
+  
+  <div id="result" class="result" style="display: none;"></div>
+  
+  <script>
+    document.getElementById('sendButton').addEventListener('click', async () => {
+      const phoneNumber = document.getElementById('phoneNumber').value;
+      const resultDiv = document.getElementById('result');
+      
+      if (!phoneNumber) {
+        resultDiv.textContent = 'Please enter a phone number';
+        resultDiv.className = 'result error';
+        resultDiv.style.display = 'block';
+        return;
+      }
+      
+      try {
+        resultDiv.textContent = 'Sending SMS...';
+        resultDiv.className = 'result';
+        resultDiv.style.display = 'block';
+        
+        const response = await fetch('/api/test/send-test-sms', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ phoneNumber })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          resultDiv.textContent = `Success! SMS sent with SID: ${data.sid}`;
+          resultDiv.className = 'result success';
+        } else {
+          resultDiv.textContent = `Error: ${data.error}. Details: ${data.details || 'No details provided'}`;
+          resultDiv.className = 'result error';
+        }
+      } catch (error) {
+        resultDiv.textContent = `Error: ${error.message}`;
+        resultDiv.className = 'result error';
+      }
+    });
+  </script>
+</body>
+</html> 
